@@ -11,20 +11,20 @@ const signUpSchema = z.object({
     email: z.string().email(),
     firstName: z.string(),
     lastName: z.string(),
-    password: z.string()
+    password: z.string().min(6, "Password must be atleast 6 characters.")
 });
 
 
 const signInSchema = z.object({
     email: z.string().email(),
-    password: z.string().length(6, "Password must be 6 characters.")
+    password: z.string().min(6, "Password must be atleast 6 characters.")
 });
 
 
 const updateUserSchema = z.object({
     firstName: z.string().optional(),
     lastName: z.string().optional(),
-    password: z.string().length(6, "Password must be 6 characters.").optional(),
+    password: z.string().min(6, "Password must be atleast 6 characters.").optional(),
 })
 
 
@@ -42,13 +42,13 @@ userRouter.post("/signup", async (req, res) => {
         }
 
         const findUser = await User.findOne({
-            username: userData.email
+            email: userData.email
         });
 
         //handle duplicate users
         if (findUser) {
             return res.status(409).json({
-                message: "username already exists!"
+                message: "email already exists!"
             });
         }
 
@@ -90,17 +90,17 @@ userRouter.post("/signup", async (req, res) => {
 //on signin -> send a token in res.
 userRouter.post("/signin", async (req, res) => {
     try {
-        const validateInp = await signInSchema(req.body);
+        const validateInp =  signInSchema.safeParse(req.body);
         const userData = req.body;
 
         if (!validateInp.success) {
-            return res.statu(411).json({
+            return res.status(411).json({
                 message: "Invalid inputs!"
             })
         }
 
         const existingUser = await User.findOne({
-            username: userData.email
+            email: userData.email
         });
 
         if (!existingUser) {
@@ -108,7 +108,7 @@ userRouter.post("/signin", async (req, res) => {
                 message: "User not found, Please Sign up!"
             })
         }
-
+        // console.log(existingUser.password + " hased pass!")
         const decodePass = await bcrypt.compare(userData.password, existingUser.password);
 
         if (!decodePass) {
@@ -141,24 +141,36 @@ userRouter.put("/", authMiddleware, async (req, res) => {
         const validateInp = updateUserSchema.safeParse(req.body);
         const userData = req.body;
 
+        const updatedBody={};
+
+        if(userData.firstName) {
+            updatedBody.firstNamae = userData.firstNamae
+        }
+
+        if(userData.lastName) {
+            updatedBody.lastName = userData.lastName
+        }
+
+        if(userData.password) {
+            const hashedPass = await bcrypt.hash(userData.password,10);
+            updatedBody.password = hashedPass
+        }
+
         if (!validateInp.success) {
             return res.status(411).json({
                 message: "Invalid input"
             })
         }
 
-        const updatedUser = await User.findByIdAndUpdate({
-            _id: req.userId,
-        }, {
-            userData
-        });
+        // console.log(userData);
+
+        const updatedUser = await User.findByIdAndUpdate({_id: req.userId},updatedBody);
 
         if (updatedUser) {
             return res.status(200).json({
                 message: "User updated successfully!"
-            })
+            });
         }
-
         return res.status(404).json({
             message: "User not found!"
         })
