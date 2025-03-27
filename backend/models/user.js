@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-    username: {
+    email: {
         type: String,
         require: true,
         unique: true,
@@ -33,3 +33,6 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", userSchema);
 module.exports = User;
+
+//trim - to remove white-spaces
+//lowercase - to get rid of duplicates "User" "user" (cases)
