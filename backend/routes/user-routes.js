@@ -4,6 +4,7 @@ const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const authMiddleware = require('../middlewares/auth-middleware');
+const Account = require('../models/account');
 
 const userRouter = Router();
 
@@ -54,7 +55,7 @@ userRouter.post("/signup", async (req, res) => {
 
         //hash pass and store
         const hashedPass = await bcrypt.hash(userData.password, 10);
-        console.log(`Hashed pass : ${hashedPass}`);
+        // console.log(`Hashed pass : ${hashedPass}`);
 
         const newUser = await User.create({
             email: userData.email,
@@ -64,10 +65,16 @@ userRouter.post("/signup", async (req, res) => {
         });
 
         if (newUser) {
+
+            await Account.create({
+                userId:newUser._id,
+                balance:10000
+            });
+
             const secret_key = process.env.JWT_SECRET_KEY;
             const token = jwt.sign({ userId: newUser._id }, secret_key);
 
-            console.log("created user and token : " + newUser + " token is " + token);
+            // console.log("created user and token : " + newUser + " token is " + token);
             return res.status(200).json({
                 message: "User created successfully!",
                 token: token,
@@ -183,6 +190,31 @@ userRouter.put("/", authMiddleware, async (req, res) => {
         })
     }
 });
+
+userRouter.get("/bulk", authMiddleware, async(req,res)=>{
+
+    try {
+        const filter = req.query.filter || ""; 
+        const users = await User.find({
+            $or : [
+                {firstName:{ "$regex": filter}},  //searches in sub-quries too
+                {lastName:{ "$regex": filter}}
+            ]
+        }).select("-password")
+
+        return res.status(200).json({
+            users:users,
+            message:"Fetched users accr to query"
+        })
+        
+    } catch (error) {
+        console.error("Error in get-users functionality "+error);
+        return res.status(500).json({
+            message:"Internal server error",
+            error:error.message
+        })
+    }
+})
 
 module.exports = userRouter;
 

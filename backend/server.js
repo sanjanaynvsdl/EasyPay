@@ -21,6 +21,7 @@ app.use("/api/v1", routes);
 
 //connect to db
 connectDB();
+
 const port = process.env.PORT || 3000
 app.listen(port,()=>{
     console.log('server is listening to port 3000')

@@ -1,13 +1,10 @@
 const Router = require("express");
 const userRoutes = require('./user-routes');
+const accRoutes = require('./account-routes');
 
 const router = Router();
-
-router.get("/",(req,res)=>{
-    res.send("gtg!")
-});
-
 router.use("/user",userRoutes);
+router.use("/account",accRoutes);
 
 
 module.exports=router;
