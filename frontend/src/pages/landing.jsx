@@ -6,7 +6,10 @@ export default function LandingPage() {
     <div className="md:overflow-hidden md:h-screen">
       <div className="w-full min-h-screen bg-[#eef2ff] flex flex-col items-center py-12 px-6 sm:px-10 sm:py-12">
         <div className="flex flex-col mb-10">
-            <p className="text-center mb-4 tracking-tight text-lg ">Welcome to <span className="text-[#5153e6] font-bold">Easy Pay.</span></p>
+          <p className="text-center mb-4 tracking-tight text-lg ">
+            Welcome to{" "}
+            <span className="text-[#5153e6] font-bold">Easy Pay.</span>
+          </p>
           <p className="text-black text-3xl md:text-4xl  text-center font-bold tracking-tight mb-4">
             Make seamless transactions with just a tap!
           </p>
@@ -18,7 +21,7 @@ export default function LandingPage() {
           <div>
             <SignUp />
           </div>
-          <div className="hidden sm:block">
+          <div className="">
             <img src={herosectionImage} className="h-md w-lg" />
           </div>
         </div>
