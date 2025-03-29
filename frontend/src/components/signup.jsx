@@ -1,6 +1,8 @@
 import { useState } from "react";
 import InputBox from "../components/input-box";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { signUp } from "../api/api-calls";
+import axiosInstance from "../api/axios-instance";
 
 export default function SignUp() {
   const [firstName, setFirstName] = useState("");
@@ -8,17 +10,53 @@ export default function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSignUp = (e) => {
-    e.preventDefault();
-    console.log(
-      `The values for login are ${firstName} ${lastName} ${email} ${password}`
-    );
+  const [error, setError] = useState(null);
+  const [isLoading, SetIsLoading] = useState(false);
 
-    //todo: backend call
-    setFirstName("");
-    setLastName("");
-    setPassword("");
-    setEmail("");
+  const navigate = useNavigate();
+
+  const handleSignUp = async (e) => {
+    e.preventDefault();
+    console.log("function triggered!")
+    setError(null);
+    SetIsLoading(true);
+
+    try {
+
+      const response = await axiosInstance.post("/user/signup", {
+        firstName,
+        lastName,
+        email,
+        password,
+      });
+
+      console.log(response.data);
+      localStorage.setItem("token", response.token);
+      navigate("/home");
+
+    } catch (error) {
+      if (error.response && error.response.data) {
+        setError(
+          error.response.data.message || "Sign Up failed, Please try again!"
+        );
+      } else {
+        setError("An unknown error occurred while signin up!");
+      }
+
+      setTimeout(() => {
+        setError(null);
+      }, 3000);
+
+
+    } finally{
+
+      SetIsLoading(false);
+      setFirstName("");
+      setLastName("");
+      setEmail("");
+      setPassword("");
+
+    }
   };
 
   return (
@@ -33,6 +71,8 @@ export default function SignUp() {
           <div className="flex flex-col md:flex-row ">
             <InputBox
               size="small"
+              type="string"
+              placeholder=""
               name="firstName"
               label="First Name"
               value={firstName}
@@ -40,6 +80,8 @@ export default function SignUp() {
             />
             <InputBox
               size="lg"
+              type="string"
+              placeholder=""
               name="lastName"
               label="Last Name"
               value={lastName}
@@ -49,12 +91,16 @@ export default function SignUp() {
           <InputBox
             size="lg"
             name="email"
+            type="string"
+            placeholder=""
             label="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
           <InputBox
             size="lg"
+            type="password"
+            placeholder=""
             name="password"
             label="Password"
             value={password}
@@ -62,11 +108,18 @@ export default function SignUp() {
           />
 
           <button
+            disabled={isLoading}
             type="submit"
-            className="outline-none bg-[#6063f4] text-white py-2 text-lg my-1 rounded-lg cursor-pointer hover:bg-[#6063f4]/80"
+            className={`outline-none disabled:bg-[#9b9cd5] bg-[#6063f4] text-white py-2 text-lg my-1 rounded-lg 
+               hover:bg-[#6063f4]/80 ${isLoading ? "cursor-not-allowed":"cursor-pointer"}`}
           >
-            Submit
+            {isLoading ? "signin up..." : "Submit"}
           </button>
+
+          <div className="flex justify-center my-2"> 
+            {error && <p className="bg-red-200 border-1 border-red-400 px-2 py-1 rounded-md  text-sm ">{error}</p>}
+
+          </div>
         </form>
         <p className="text-center my-2">
           Already have an account?{" "}

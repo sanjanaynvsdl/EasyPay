@@ -12,20 +12,20 @@ const signUpSchema = z.object({
     email: z.string().email(),
     firstName: z.string(),
     lastName: z.string(),
-    password: z.string().min(6, "Password must be atleast 6 characters.")
+    password: z.string()
 });
 
 
 const signInSchema = z.object({
     email: z.string().email(),
-    password: z.string().min(6, "Password must be atleast 6 characters.")
+    password: z.string()
 });
 
 
 const updateUserSchema = z.object({
     firstName: z.string().optional(),
     lastName: z.string().optional(),
-    password: z.string().min(6, "Password must be atleast 6 characters.").optional(),
+    password: z.string().optional(),
 })
 
 
@@ -99,8 +99,9 @@ userRouter.post("/signin", async (req, res) => {
     try {
         const validateInp =  signInSchema.safeParse(req.body);
         const userData = req.body;
-
         if (!validateInp.success) {
+            console.log("entered!")
+            console.log(validateInp.error);
             return res.status(411).json({
                 message: "Invalid inputs!"
             })
@@ -190,6 +191,23 @@ userRouter.put("/", authMiddleware, async (req, res) => {
         })
     }
 });
+
+userRouter.get("/", authMiddleware, async(req,res)=>{
+    try {
+        const userId = req.userId;
+        const userData = await User.findById(userId);
+        return res.status(200).json({
+            username:userData.firstName +" "+userData.lastName,
+        });
+
+    } catch (error) {
+        console.error(`Error in get-user route ${error}`);
+        return res.status(500).json({
+            message:"Internal server error!",
+            error:error.message,
+        })
+    }
+})
 
 userRouter.get("/bulk", authMiddleware, async(req,res)=>{
 

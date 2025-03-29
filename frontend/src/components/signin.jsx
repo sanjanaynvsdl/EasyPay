@@ -1,24 +1,48 @@
 import { useState } from "react";
 import InputBox from "../components/input-box";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axiosInstance from "../api/axios-instance";
 
 export default function SignIn() {
-  
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
 
-  const handleSignIn = (e) => {
+  const [error, setError] = useState(null);
+  const [isLoading, SetIsLoading] = useState(false);
+
+  const navigate = useNavigate();
+
+  const handleSignIn = async (e) => {
     e.preventDefault();
-    console.log(
-      `Values for sign in are ${formData.email} ${formData.password}`
-    );
-    setFormData({
-      email: "",
-      password: "",
-    });
+
+    setError(null);
+    SetIsLoading(true);
+
+    try {
+      const response = await axiosInstance.post("/user/signin", formData);
+      if (response.data.token) {
+        localStorage.setItem("token", response.data.token);
+        navigate("/home");
+      }
+    } catch (error) {
+      if (error.response && error.response.data) {
+        setError(
+          error.response.data.message || "Sign In failed, Please try again!"
+        );
+      } else {
+        setError("An unknow error occurred while sign up!");
+      }
+    } finally {
+      SetIsLoading(false);
+      setFormData({
+        email: "",
+        password: "",
+      });
+    }
   };
+
   const handleFormChange = (e) => {
     setFormData((prevData) => ({
       ...prevData,
@@ -36,31 +60,49 @@ export default function SignIn() {
 
         <form className="flex flex-col" onSubmit={handleSignIn}>
           <InputBox
-            size="lg" 
-            name="email" 
+            size="lg"
+            type="string"
+            placeholder=""
+            name="email"
             label="Email"
             value={formData.email}
-            onChange={handleFormChange} 
-           />
+            onChange={handleFormChange}
+          />
 
           <InputBox
-            size="lg" 
-            name="password" 
+            size="lg"
+            type="password"
+            placeholder=""
+            name="password"
             label="Password"
             value={formData.password}
-            onChange={handleFormChange}  />
+            onChange={handleFormChange}
+          />
 
           <button
+            disabled={isLoading}
             type="submit"
-            className="bg-[#6063f4] text-white py-2 text-lg my-1 rounded-lg cursor-pointer hover:bg-[#6063f4]/80"
+            className={`outline-none disabled:bg-[#9b9cd5] bg-[#6063f4] text-white py-2 text-lg my-1 rounded-lg 
+               hover:bg-[#6063f4]/80 ${
+                 isLoading ? "cursor-not-allowed" : "cursor-pointer"
+               }`}
           >
-            Submit
+            {isLoading ? "signin in..." : "Submit"}
           </button>
+          <div className="flex justify-center my-2">
+            {error && (
+              <p className="bg-red-200 border-1 border-red-400 px-2 py-1 rounded-md  text-sm">
+                {error}
+              </p>
+            )}
+          </div>
         </form>
 
         <p className="text-center my-2">
           Don't have an account?{" "}
-          <Link to="/" className="text-[#6063f4] underline">SingUp</Link>
+          <Link to="/" className="text-[#6063f4] underline">
+            SingUp
+          </Link>
         </p>
       </div>
     </div>
