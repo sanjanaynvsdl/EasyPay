@@ -28,7 +28,7 @@ export default function SignUp() {
         password,
       });
 
-      localStorage.setItem("token", response.token);
+      localStorage.setItem("token", response.data.token);
       navigate("/home");
 
     } catch (error) {
