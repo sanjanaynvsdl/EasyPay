@@ -11,18 +11,20 @@ export default function Dashboard() {
   const [username, setUserName] = useState("");
 
   const [users, setUsers] = useState([]);
-  const [filteredUsers, setFilteredUserd] = useState([]);
   const [selecteduser, setSelecteduser] = useState(null);
-  const searchUser = useRef("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const [isLoading, SetIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
+
+  //on component mount, BE calls
   useEffect(() => {
     getUserName();
     getBalance();
     getUsers();
   }, []);
+
 
   const getBalance = async () => {
     setError(null);
@@ -83,7 +85,7 @@ export default function Dashboard() {
           token: localStorage.getItem("token"),
         },
       });
-      console.log(response.data.users[0]);
+      
       setUsers(response.data?.users);
     } catch (error) {
       if (error.response && error.response.data) {
@@ -96,10 +98,23 @@ export default function Dashboard() {
     }
   };
 
-  const handleFilteredUsers = () => {
-    // setUsers((user)=>(
-    // ))
-  };
+  //filter acc to search query
+  const filteredusers = users?.filter(
+    (user) =>
+      user.firstName.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
+      user.email.toLowerCase().includes(searchQuery.toLowerCase().trim())
+  );
+
+  const handleSelectedUser=(user)=>{
+    setSelecteduser(user);
+  }
+  console.log(selecteduser);
+  
+
+  //transfer amount
+  const transferAmount = async()=>{
+
+  }
 
   return (
     <div>
@@ -118,44 +133,44 @@ export default function Dashboard() {
           )}
 
           <div className="flex md:flex-row flex-col gap-6 justify-center">
-            {isLoading ? 
-            <div className="bg-white border border-[#e3e3e3] px-12 py-6 shadow-xl rounded-lg animate-pulse">
-            <div className="h-12 bg-gray-300 rounded-md w-[14rem] mx-auto mb-2"></div>
-            <div className="h-[12rem] bg-gray-300 rounded-md w-[14rem] mx-auto mb-2"></div>
-          </div>
-          : (
+            {isLoading ? (
+              <div className="bg-white border border-[#e3e3e3] px-12 py-6 shadow-xl rounded-lg animate-pulse">
+                <div className="h-12 bg-gray-300 rounded-md w-[14rem] mx-auto mb-2"></div>
+                <div className="h-[12rem] bg-gray-300 rounded-md w-[14rem] mx-auto mb-2"></div>
+              </div>
+            ) : (
+              <div>
+                <div className="bg-white border border-[#e3e3e3]  py-6 px-4 shadow-xl rounded-lg max-w-2xl">
+                  <div className="flex flex-col justify-start">
+                    <p className="text-xl font-bold mb-4 px-2">Users</p>
+                    <div className="mb-2">
+                      <InputBox
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search for a user"
+                      />
+                    </div>
 
-            <div>
-              <div className="bg-white border border-[#e3e3e3]  py-6 px-4 shadow-xl rounded-lg max-w-2xl">
-                <div className="flex flex-col justify-start">
-                  <p className="text-xl font-bold mb-4 px-2">Users</p>
-                  <div className="mb-2">
-                    <InputBox
-                      ref={searchUser}
-                      placeholder="Search for a user"
-                    />
-                  </div>
-
-                  <div className="flex flex-col items-start max-h-[14rem] overflow-y-auto">
-                    {users.length > 0 &&
-                      users.map((user, index) => (
-                        <div key={index}>
-                          <User
-                            firstName={user.firstName}
-                            lastName={user.lastName}
-                            email={user.email}
-                          />
-                        </div>
-                      ))}
+                    <div className="flex flex-col items-start max-h-[14rem] overflow-y-auto">
+                      {filteredusers.length > 0 &&
+                        filteredusers.map((user, index) => (
+                          <div key={index}>
+                            <User
+                              onClick={()=>handleSelectedUser(user)}
+                              firstName={user.firstName}
+                              lastName={user.lastName}
+                              email={user.email}
+                              isSelected={false}
+                            />
+                          </div>
+                        ))}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )  
-          }
+            )}
 
             {/* users */}
-            <SendMoney />
+            <SendMoney  isSelected={selecteduser==null? false:true} selecteduser={selecteduser} getBalance={getBalance} currBalance={balance}/>
           </div>
         </div>
       </div>
