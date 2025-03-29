@@ -22,7 +22,7 @@ export default function SignIn() {
 
     try {
       const response = await axiosInstance.post("/user/signin", formData);
-      if (response.data.token) {
+      if (response.data?.token) {
         localStorage.setItem("token", response.data.token);
         navigate("/home");
       }
@@ -32,7 +32,7 @@ export default function SignIn() {
           error.response.data.message || "Sign In failed, Please try again!"
         );
       } else {
-        setError("An unknow error occurred while sign up!");
+        setError("Sign In failed, Please try again!");
       }
     } finally {
       SetIsLoading(false);
@@ -82,12 +82,12 @@ export default function SignIn() {
           <button
             disabled={isLoading}
             type="submit"
-            className={`outline-none disabled:bg-[#9b9cd5] bg-[#6063f4] text-white py-2 text-lg my-1 rounded-lg 
-               hover:bg-[#6063f4]/80 ${
-                 isLoading ? "cursor-not-allowed" : "cursor-pointer"
+            className={`outline-none disabled:bg-[#9b9cd5]  text-white py-2 text-lg my-1 rounded-lg 
+                ${
+                 isLoading ? "cursor-not-allowed bg-[#9b9cd5]" : "cursor-pointer bg-[#6063f4] hover:bg-[#6063f4]/80"
                }`}
           >
-            {isLoading ? "signin in..." : "Submit"}
+            {isLoading ? "Loading..." : "Submit"}
           </button>
           <div className="flex justify-center my-2">
             {error && (

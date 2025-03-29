@@ -16,17 +16,17 @@ export default function SendMoney({
   const [success, setIsSucess] = useState(false);
 
   const handleTransaction = async () => {
-    console.log("helo--button logged");
-    console.log(isSelected);
+    
+    if (amount > currBalance) {
+      setError("Insufficient balance!");
+      return;
+    }
+
     setError(null);
     SetIsLoading(true);
     setIsSucess(false);
 
     try {
-      if (amount > currBalance) {
-        setError("Insufficient funds!");
-        return;
-      }
       const response = await axiosInstance.post("/account/transfer", {
         to: selecteduser._id,
         amount: amount,
@@ -42,12 +42,20 @@ export default function SendMoney({
       }
       setAmount(0);
 
+      setTimeout(()=>{
+        setIsSucess(false);
+      },4000)
+
     } catch (error) {
 
       if(error.response && error.response.data) {
         setError(error.response.data?.message || "Transaction failed, Please try again!")
       } else {
-        setError("Transaction failed!")
+        setError("Transaction failed!");
+
+        setTimeout(()=>{
+          setError(null);
+        },4000);
       }
     } finally {
       SetIsLoading(false);
@@ -62,7 +70,7 @@ export default function SendMoney({
 
         <div className="flex mb-4">
           {!isSelected ? (
-            <p className="">select a user to send money!</p>
+            <p className="">Choose a user first.</p>
           ) : (
             <div>
               <User
@@ -88,7 +96,7 @@ export default function SendMoney({
              ${isLoading && "bg-[#9b9cd5]"}
              ${isSelected==false ? "bg-[#9b9cd5] cursor-not-allowed":"bg-[#7f8afa]" }`}
         >
-          {isLoading ? "Processing...":"Initiate transaction"}
+          {isLoading ? "Processing..." : "Initiate Transaction"}
         </button>
         <div className="py-1">
           {error && <p className="bg-red-200 border-1 text-center border-red-400 px-2 py-2 rounded-md  text-sm ">{error}</p>}

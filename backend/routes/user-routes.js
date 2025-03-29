@@ -38,7 +38,7 @@ userRouter.post("/signup", async (req, res) => {
 
         if (!validateInp.success) {
             return res.status(411).json({
-                message: "Invalid Inputs!"
+                message: "Please provide a valid input!"
             })
         }
 
@@ -100,10 +100,8 @@ userRouter.post("/signin", async (req, res) => {
         const validateInp =  signInSchema.safeParse(req.body);
         const userData = req.body;
         if (!validateInp.success) {
-            console.log("entered!")
-            console.log(validateInp.error);
             return res.status(411).json({
-                message: "Invalid inputs!"
+                message: "Please provide a valid input!"
             })
         }
 

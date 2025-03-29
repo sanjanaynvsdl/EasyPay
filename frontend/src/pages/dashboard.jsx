@@ -48,8 +48,13 @@ export default function Dashboard() {
       } else {
         setError("An unknown error occurred while fetching balance!");
       }
+
     } finally {
       SetIsLoading(false);
+
+      setTimeout(()=>{
+        setError(null);
+      },4000);
     }
   };
 
@@ -71,6 +76,11 @@ export default function Dashboard() {
       } else {
         setError("An unknow error occurred while fetching user-details!");
       }
+
+      setTimeout(()=>{
+        setError(null);
+      },4000);
+
     } finally {
       SetIsLoading(false);
     }
@@ -93,6 +103,11 @@ export default function Dashboard() {
       } else {
         setError("An unknown error occurred while fetching users.");
       }
+
+      setTimeout(()=>{
+        setError(null);
+      },4000);
+
     } finally {
       SetIsLoading(false);
     }
@@ -108,13 +123,7 @@ export default function Dashboard() {
   const handleSelectedUser=(user)=>{
     setSelecteduser(user);
   }
-  console.log(selecteduser);
-  
 
-  //transfer amount
-  const transferAmount = async()=>{
-
-  }
 
   return (
     <div>
@@ -131,6 +140,13 @@ export default function Dashboard() {
           ) : (
             <CurrentBalance balance={balance} username={username} />
           )}
+          <div className="text-center">
+          {error && (
+              <p className="bg-red-200 border-1 border-red-400 px-2 py-2 rounded-md  text-sm">
+                {error}
+              </p>
+            )}
+          </div>
 
           <div className="flex md:flex-row flex-col gap-6 justify-center">
             {isLoading ? (
@@ -169,7 +185,6 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* users */}
             <SendMoney  isSelected={selecteduser==null? false:true} selecteduser={selecteduser} getBalance={getBalance} currBalance={balance}/>
           </div>
         </div>

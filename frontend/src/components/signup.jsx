@@ -1,7 +1,6 @@
 import { useState } from "react";
 import InputBox from "../components/input-box";
 import { Link, useNavigate } from "react-router-dom";
-import { signUp } from "../api/api-calls";
 import axiosInstance from "../api/axios-instance";
 
 export default function SignUp() {
@@ -17,7 +16,6 @@ export default function SignUp() {
 
   const handleSignUp = async (e) => {
     e.preventDefault();
-    console.log("function triggered!")
     setError(null);
     SetIsLoading(true);
 
@@ -30,7 +28,6 @@ export default function SignUp() {
         password,
       });
 
-      console.log(response.data);
       localStorage.setItem("token", response.token);
       navigate("/home");
 
@@ -40,12 +37,8 @@ export default function SignUp() {
           error.response.data.message || "Sign Up failed, Please try again!"
         );
       } else {
-        setError("An unknown error occurred while signin up!");
+        setError("An unknown error occurred while sign up!");
       }
-
-      setTimeout(() => {
-        setError(null);
-      }, 3000);
 
 
     } finally{
@@ -110,10 +103,10 @@ export default function SignUp() {
           <button
             disabled={isLoading}
             type="submit"
-            className={`outline-none disabled:bg-[#9b9cd5] bg-[#6063f4] text-white py-2 text-lg my-1 rounded-lg 
-               hover:bg-[#6063f4]/80 ${isLoading ? "cursor-not-allowed":"cursor-pointer"}`}
+            className={`outline-none disabled:bg-[#9b9cd5]  text-white py-2 text-lg my-1 rounded-lg 
+                ${isLoading ? "cursor-not-allowed bg-[#9b9cd5]":"cursor-pointer bg-[#6063f4] hover:bg-[#6063f4]/80"}`}
           >
-            {isLoading ? "signin up..." : "Submit"}
+            {isLoading ? "Loading..." : "Submit"}
           </button>
 
           <div className="flex justify-center my-2"> 
