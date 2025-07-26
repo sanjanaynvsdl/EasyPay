@@ -3,7 +3,7 @@ import SignUp from "../components/signup";
 
 export default function LandingPage() {
   return (
-    <div className="md:overflow-hidden md:h-screen">
+    <div className="min-h-screen overflow-x-hidden">
       <div className="w-full min-h-screen bg-[#eef2ff] flex flex-col items-center py-12 px-6 sm:px-10 sm:py-12">
         <div className="flex flex-col mb-10">
           <p className="text-center mb-4 tracking-tight text-lg ">

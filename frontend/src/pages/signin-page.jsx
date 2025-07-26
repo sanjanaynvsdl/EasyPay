@@ -2,7 +2,7 @@ import SignIn from "../components/signin";
 
 export default function SignInPage() {
   return (
-    <div className="bg-[#eef2ff] md:overflow-hidden min-h-screen">
+      <div className="bg-[#eef2ff]  min-h-screen overflow-x-hidden">
       <div className="flex justify-center items-center py-12 px-8 sm:px-auto flex-col">
         <div className="">
           <p className="text-3xl md:text-4xl text-black font-bold mb-6 tracking-tight">
